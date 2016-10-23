@@ -1,0 +1,24 @@
+Sorting the sorted list using the function f defined in the exercise f[1..100000] took sufficient time to have lunch, with plenty to spare, being on 21170 when aborted.
+
+
+We would need a function to remove elements that we have exhausted the permuations for in the given list.
+y is the element that we want removed from a list xs
+
+removeElem y xs = [x | x <-xs, x /= y]
+
+Then a simple permutations function can be defined as follows:
+
+permutations [] = [[]]
+permutations xs = [x:ys | x <- xs, ys <- permutations (removeElem x xs)]
+
+
+Executing <<let n = y in map f (permutations [1..n])>> we get the following times:
+
+if n=8, the time is 4.31 secs
+if n=7, the time is 0.49 secs
+if n=6, the time is 0.08 secs
+if n=5, the time is 0.02 secs
+if n=4, the time is 0.02 secs
+if n=3, the time is 0.02 secs
+
+It seems like the growth in time is exponential.
