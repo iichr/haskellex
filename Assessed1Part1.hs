@@ -118,7 +118,7 @@ memSize s = 8 * (length s)
 -- followed by a string, or as in the original decompression function:
 decompress' :: String -> String
 decompress' (x:xs) =
-  if x == '*' then xs else decompress xs
+  if x == '*' then xs else decompress (x:xs)
 
 {- Generate the frequency table -}
 --An element of the type Freq is a symbol together with its frequency.
