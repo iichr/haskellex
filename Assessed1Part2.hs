@@ -138,8 +138,8 @@ leafify xs = map ((\(k,v) -> Leaf k v)) xs
 --CHR
 -- Sorting the frequency list in ascending order
 -- !! Only works on list of frequencies not with trees.
-sortByFrequency :: Eq c => [c] -> [Freq c]
-sortByFrequency xs = sortBy (compare `on` snd) (tabulate xs)
+sortByFrequency :: [Freq c] -> [Freq c]
+sortByFrequency xs = sortBy (compare `on` snd) xs
 
 insertCorrect :: Tree c  -> [Tree c] -> [Tree c]
 insertCorrect t xss = xs ++ [t] ++ ys
@@ -178,7 +178,8 @@ expectedmerge3 = Branch t1 t2 25
 
 mergeTest = [mergeinput1 ==expectedmerge1, mergeinput2 == expectedmerge2, mergeinput3 == expectedmerge3]
 -- leafify Testing:
-leafifyTest = leafify (sortByFrequency "abacbcbababaaaddddwwwerttt")
+leafifyTest = leafify (sortByFrequency (tabulate "abacbcbababaaaddddwwwrttt")) == leafifyexpected
+leafifyexpected = [Leaf 'r' 1, Leaf 'c' 2, Leaf 'w' 3, Leaf 't' 3, Leaf 'd' 4, Leaf 'b' 5, Leaf 'a' 7]
 -- makeTree Testing:
 -- NB: Remember to sort list beforehand when testing.
 -- treelist2 = [testleaf2, testbranch2, mergeinput1, testbranch1, mergeinput3]
@@ -189,12 +190,13 @@ makeTreeTest = Branch (Leaf 'e' 45) branchR 102 == makeTree treelist1
     where
         branchR = Branch (Branch (Leaf 'c' 10) (Branch (Leaf 'a' 5) (Leaf 'b' 7) 12) 22) (Branch (Leaf 'd' 15) (Leaf 'e' 20) 35) 57
 
-
+generateTreeTest = generateTree (tabulate "abacbcbababaaaddddwwwrttt") == generateexpected
+generateexpected = Branch (Branch (Leaf 'b' 5) (Branch (Leaf 'w' 3) (Leaf 't' 3) 6) 11) (Branch (Leaf 'a' 7) (Branch (Leaf 'd' 4) (Branch (Leaf 'r' 1) (Leaf 'c' 2) 3) 7) 14) 25
 
 -- Question:
 -- Generate a tree from list of Freqs (using makeTree above):
 generateTree :: [Freq c] -> Tree c
-generateTree = undefined
+generateTree xs = makeTree (leafify (sortByFrequency xs))
 
 -- Encoding table.
 -- A key is a key-value pair (an entry in a map/table).
