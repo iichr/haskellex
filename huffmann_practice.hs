@@ -8,7 +8,7 @@ Part 1 consist of a couple of general exericises.
 --Exercise 1: Given a string, create a frequency table of the occurrences
 --of each letter in the string (count the number of instances basically)
 
-count x xs = length [x'| x' <- xs, x==x']
+count x xs = length [x' | x' <- xs, x==x']
 
 freq xs = removeduplicates [(x,count x ys)| x <- ys]
     where

@@ -185,8 +185,8 @@ leafifyexpected = [Leaf 'r' 1, Leaf 'c' 2, Leaf 'w' 3, Leaf 't' 3, Leaf 'd' 4, L
 -- treelist2 = [testleaf2, testbranch2, mergeinput1, testbranch1, mergeinput3]
 -- makeTreeTest2 = makeTree treelist2 == merge mergeinput3 (merge (merge testleaf2 testbranch2) (merge mergeinput1 testbranch1))
 
-treelist1 = [Leaf 'a' 5, Leaf 'b' 7, Leaf 'c' 10, Leaf 'd' 15, Leaf 'e' 20, Leaf 'e' 45]
-makeTreeTest = Branch (Leaf 'e' 45) branchR 102 == makeTree treelist1
+treelist1 = [Leaf 'a' 5, Leaf 'b' 7, Leaf 'c' 10, Leaf 'd' 15, Leaf 'e' 20, Leaf 'f' 45]
+makeTreeTest = Branch (Leaf 'f' 45) branchR 102 == makeTree treelist1
     where
         branchR = Branch (Branch (Leaf 'c' 10) (Branch (Leaf 'a' 5) (Leaf 'b' 7) 12) 22) (Branch (Leaf 'd' 15) (Leaf 'e' 20) 35) 57
 
@@ -208,7 +208,20 @@ type CodingTable c = [Key c]
 -- Question:
 -- Given a tree, generates a coding table
 makeTable :: Eq c => Tree c -> CodingTable c
-makeTable = undefined
+makeTable tree = bitToDict [] tree
+
+--CHR
+bitToDict :: Eq c => [Bit] -> Tree c -> CodingTable c
+bitToDict s (Leaf a _ ) = [(a,s)]
+bitToDict s (Branch left right _) = bitToDict (s++[Z]) left ++ bitToDict (s++[I]) right
+
+-- Testing makeTable
+-- Output is ordered from left to right DFS
+testtree1 = generateexpected
+makeTableTest = makeTable testtree1 == tableexpected
+tableexpected = [('b', readBits "00"),('w', readBits "010"),('t', readBits "011"),('a',readBits"10"),('d',readBits"110"),('r',readBits"1110"),('c',readBits"1111")]
+makeTableTest2 = makeTable (makeTree (treelist1)) == tableexpected2
+tableexpected2 = zip ['f','c','a','b','d','e'] [readBits x | x <- ["0","100","1010","1011","110","111"]]
 
 -- Question:
 -- Takes a string of symbols to a bit string, based on a given coding table
