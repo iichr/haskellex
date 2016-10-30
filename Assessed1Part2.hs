@@ -123,19 +123,17 @@ mapSnd f (c,a) = (c, f a)
 -- Question:
 makeTree :: [Tree c] -> Tree c
 -- Collects a list of trees into an optimal prefix tree.
-makeTree = undefined
+makeTree (t1:[]) = t1
+makeTree (t1:t2:[]) = merge t1 t2
+makeTree (t1:t2:ts) = makeTree tsordered
+    where
+        tsordered = insertCorrect (merge t1 t2) (tail(tail(t1:t2:ts)))
 
--- CHR
+--CHR
 -- Convert the frequency pairs to leaves
 leafify :: [Freq c] -> [Tree c]
 leafify xs = map ((\(k,v) -> Leaf k v)) xs
 
--- For testing purposes
-leafifyTest = leafify (sortByFrequency "abacbcbababaaaddddwwwerttt")
-testleaf1 = Leaf 'k' 5
-testleaf2 = Leaf 'k' 8
-testbranch1 = Branch (Leaf 'z' 13) (Leaf 'q' 2) 15
-testbranch2 = Branch (Leaf 'z' 1) (Leaf 'e' 3) 4
 
 --CHR
 -- Sorting the frequency list in ascending order
@@ -155,7 +153,43 @@ getVal (Leaf _ x) = x
 
 -- You may wish to use a helper function such as this:
 merge :: Tree c -> Tree c -> Tree c
-merge = undefined
+merge (Branch t1 t2 p) (Leaf a q) = Branch (Leaf a q) (Branch t1 t2 p) (p+q)
+merge (Leaf a q)  (Branch t1 t2 p) = Branch (Leaf a q) (Branch t1 t2 p) (p+q)
+merge (Leaf a p) (Leaf b q) = Branch (Leaf a p) (Leaf b q) (p+q)
+merge (Branch t1 t2 p) (Branch t3 t4 q) = Branch (Branch t1 t2 p) (Branch t3 t4 q) (p+q)
+
+--CHR
+-- TESTING leafify, merge and makeTree
+-- Initial setup: 
+testleaf1 = Leaf 'k' 5
+testleaf2 = Leaf 'x' 8
+testbranch1 = Branch (Leaf 'z' 13) (Leaf 'q' 2) 15
+testbranch2 = Branch (Branch (Leaf 'z' 1) (Leaf 'e' 3) 4) (Branch (Leaf 'y' 2) (Leaf 'w' 4) 6) 10
+-- merge Testing:
+mergeinput1 = merge testleaf1 testleaf2
+mergeinput2 = merge testleaf1 testbranch1
+mergeinput3 = merge testbranch2 testbranch1
+expectedmerge1 = Branch (Leaf 'k' 5) (Leaf 'x' 8) 13
+expectedmerge2 = Branch (Leaf 'k' 5) (Branch (Leaf 'z' 13) (Leaf 'q' 2) 15) 20
+expectedmerge3 = Branch t1 t2 25
+    where
+        t1 = (Branch (Branch (Leaf 'z' 1) (Leaf 'e' 3) 4) (Branch (Leaf 'y' 2) (Leaf 'w' 4) 6) 10)
+        t2 = (Branch (Leaf 'z' 13) (Leaf 'q' 2) 15)
+
+mergeTest = [mergeinput1 ==expectedmerge1, mergeinput2 == expectedmerge2, mergeinput3 == expectedmerge3]
+-- leafify Testing:
+leafifyTest = leafify (sortByFrequency "abacbcbababaaaddddwwwerttt")
+-- makeTree Testing:
+-- NB: Remember to sort list beforehand when testing.
+-- treelist2 = [testleaf2, testbranch2, mergeinput1, testbranch1, mergeinput3]
+-- makeTreeTest2 = makeTree treelist2 == merge mergeinput3 (merge (merge testleaf2 testbranch2) (merge mergeinput1 testbranch1))
+
+treelist1 = [Leaf 'a' 5, Leaf 'b' 7, Leaf 'c' 10, Leaf 'd' 15, Leaf 'e' 20, Leaf 'e' 45]
+makeTreeTest = Branch (Leaf 'e' 45) branchR 102 == makeTree treelist1
+    where
+        branchR = Branch (Branch (Leaf 'c' 10) (Branch (Leaf 'a' 5) (Leaf 'b' 7) 12) 22) (Branch (Leaf 'd' 15) (Leaf 'e' 20) 35) 57
+
+
 
 -- Question:
 -- Generate a tree from list of Freqs (using makeTree above):
