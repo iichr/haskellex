@@ -226,17 +226,56 @@ tableexpected2 = zip ['f','c','a','b','d','e'] [readBits x | x <- ["0","100","10
 -- Question:
 -- Takes a string of symbols to a bit string, based on a given coding table
 encodeUsingTable :: Eq c => CodingTable c -> [c] -> [Bit]
-encodeUsingTable = undefined
+encodeUsingTable ctbl (x:xs) = lookupTable x ctbl ++ encodeUsingTable ctbl xs 
+encodeUsingTable ctbl [] = []
+
+lookupTable :: Eq c =>  c -> [(c,v)] -> v
+lookupTable a ((k,v):xs) = if a == k
+    then v
+    else lookupTable a xs
+
+-- Testing encodeUsingTable
+encodeUsingTbtest = encodeUsingTable tableexpected "batradwac" == encodeUsingTbexpected
+encodeUsingTbexpected = readBits "0010011111010110010101111"
+encodeUsingTbtest2 = encodeUsingTable tableexpected2 "bedcabdeafdabbec" == encodeUsingTbexpected2 
+encodeUsingTbexpected2 = readBits "10111111101001010101111011110100110101010111011111100"
 
 -- Question:
 -- Encodes directly from the tree (more efficient).
 encodeUsing :: Eq c => Tree c -> [c] -> [Bit]
-encodeUsing = undefined
+encodeUsing tree [] = []
+encodeUsing tree (x:xs) = charToBitFromTree x tree ++ encodeUsing tree xs
+
+charToBitFromTree :: Eq c => c -> Tree c -> [Bit]
+charToBitFromTree x tree = reverse (tail (charToBitHelper x tree))
+
+charToBitHelper :: Eq c => c -> Tree c -> [Bit]
+charToBitHelper x (Leaf a _) = if a == x then [I] else [Z]
+charToBitHelper x (Branch left right _) 
+    | head (charToBitHelper x left) == I = charToBitHelper x left ++ [Z]
+    | otherwise = (charToBitHelper x right) ++ [I]
+
+-- Testing charToBitFromTree
+test1 = charToBitFromTree 'a' (makeTree treelist1)
+test2 = charToBitFromTree 'b' (makeTree treelist1)
+test3 = charToBitFromTree 'c' (makeTree treelist1)
+test4 = charToBitFromTree 'd' (makeTree treelist1)
+test5 = charToBitFromTree 'e' (makeTree treelist1)
+test6 = charToBitFromTree 'f' (makeTree treelist1)
+testGemeinsam = [test1,test2,test3,test4,test5,test6]
+
+encodeUsingTest = encodeUsing testtree1 "batradwac" == encodeUsingexpected
+encodeUsingexpected = readBits "0010011111010110010101111"
+encodeUsingTest2 = encodeUsing (makeTree (treelist1)) "bedcabdeafdabbec" == encodeUsingexpected2
+encodeUsingexpected2 = readBits "10111111101001010101111011110100110101010111011111100"
 
 -- Question:
 -- From a string of symbols, generate the coding tree and the encoding
 encode :: Eq c => [c] -> (Tree c, [Bit])
-encode = undefined
+encode xs = (tree, bitseq)
+    where
+        tree = makeTree (leafify (sortByFrequency (tabulate xs)))
+        bitseq = encodeUsing tree xs
 
 -- Encoding trees
 
