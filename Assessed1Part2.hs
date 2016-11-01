@@ -129,12 +129,11 @@ makeTree (t1:t2:ts) = makeTree tsordered
     where
         tsordered = insertCorrect (merge t1 t2) (tail(tail(t1:t2:ts)))
 
---CHR
+
 -- Convert the frequency pairs to leaves
 leafify :: [Freq c] -> [Tree c]
 leafify xs = map ((\(k,v) -> Leaf k v)) xs
 
---CHR
 -- Sorting the frequency list in ascending order
 -- !! Only works on list of frequencies not with trees.
 sortByFrequency :: [Freq c] -> [Freq c]
@@ -174,7 +173,6 @@ type CodingTable c = [Key c]
 makeTable :: Eq c => Tree c -> CodingTable c
 makeTable tree = bitToDict [] tree
 
---CHR
 bitToDict :: Eq c => [Bit] -> Tree c -> CodingTable c
 bitToDict s (Leaf a _ ) = [(a,s)]
 bitToDict s (Branch left right _) = bitToDict (s++[Z]) left ++ bitToDict (s++[I]) right
