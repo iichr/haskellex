@@ -130,6 +130,18 @@ if length $ snd $ (choose from list) = 1 then
 else 
     -- case ("tetkaest", [1,5])
     -- go one by one:
-    -- 
+    splitAt (head $ snd $ choose from list) + 1 choose from list
+    if length (fst of above)-1 <=x AND length(snd of above) <=y
+    zip [fst (from list)] [ head $ snd (choose from list)] :
+    apply same function to rest of list
+
+-- implementation of the above
+tupConverter :: ([Char], [Int]) -> [([Char], Int)]
+tupConverter ent 
+    | (length $ snd $ ent ) == 1 =
+        splitIntersect = splitAt ((head $ snd $ ent) + 1) (fst $ ent)
+        if (length (fst $ splitIntersect) - 1) <= x &&
+            length (snd splitIntersect) <=y
+        then zip (fst $ ent) [(head $ snd $ ent) + 1]
 
 
