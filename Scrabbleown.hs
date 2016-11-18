@@ -103,8 +103,6 @@ lengthAfterLetter (x:xs) c
 
 -- Better Attempt: BEGIN
 -- Which words fit?
-allWords2 :: Dict -> Char -> Int -> Int -> [(String, Int)]
-allWords2 dict c x y = undefined 
 
 -- first get all words with that letter : [String]
 -- initialWords = [w | w <- allWords1 dict c, (length w <= (x+y+1))]
@@ -148,6 +146,44 @@ tupConverter ent x y
 --            length (snd splitIntersect) <=y
 --        then zip (fst $ ent) [(head $ snd $ ent) + 1]
 --        else []
-    
+
+-- implementation with pattern matching, tuple is (t, us)
+-- seems to work the same way
+tupConverter' :: (String, [Int]) -> Int -> Int -> [(String, Int)]
+tupConverter' (t,us) x y
+    | length us == 1 && ((length (fst $ splitIntersect) - 1) <= x) && (length (snd splitIntersect) <=y) = zip [t] us
+    | length us > 1 = tupConverter' (t, [head us]) x y ++ (tupConverter' (t,tail us) x y) 
+    where splitIntersect = splitAt (head us + 1) t
+
+-- get all words with given letter (passed as argument to allWords2 as well)
+allWords1 :: Dict -> Char -> [String]
+allWords1 dict x = [w | w <- dict, x `elem` w]
+
+wordsWith c dict =  allWords1 dict c;
+
+-- for every element in the list get positions of the CHAR (ditto as above)
+elemPos c dict = map (elemIndices c) (wordsWith c dict)
+
+-- get the resulting tuple lsit of element,possible index of intersection char
+wordCharPosList :: Char -> Dict -> [(String,[Int])]
+wordCharPosList c dict = zip (wordsWith c dict) (elemPos c dict)
+
+-- finally all into one fucntion
+
+allWords2 :: Dict -> Char -> Int -> Int -> [(String, Int)]
+allWords2 dict c x y = tupConverterList v x y
+    where v = wordCharPosList c dict
+
+--Attempt to make tupConverter' works straight away with wordCharPosList as input 
+tupConverterList :: [(String, [Int])] -> Int -> Int -> [(String, Int)]
+tupConverterList ((t,us) : v) x y  
+    | v==[] && length us == 1 && ((length (fst $ splitIntersect) - 1) <= x) && (length (snd splitIntersect) <=y) = zip [t] us
+    | v==[] && length us > 1 = tupConverterList [(t, [head us])] x y ++ (tupConverterList [(t,tail us)] x y) 
+    | length us == 1 && ((length (fst $ splitIntersect) - 1) <= x) && (length (snd splitIntersect) <=y) = (zip [t] us) ++ (tupConverterList v x y)
+    | length us > 1 = tupConverterList [(t, [head us])] x y ++ (tupConverterList [(t,tail us)] x y) ++ (tupConverterList v x y)
+    | otherwise = []
+    where splitIntersect = splitAt (head us + 1) t
 
 
+sampleDict :: Dict
+sampleDict = ["abacus", "aardvark", "lion", "mesmerise", "egg", "elsewhere", "somewhere", "tetkaest", "discrepancy"]
