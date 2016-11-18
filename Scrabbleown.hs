@@ -104,17 +104,18 @@ lengthAfterLetter (x:xs) c
 -- Better Attempt: BEGIN
 -- Which words fit?
 allWords2 :: Dict -> Char -> Int -> Int -> [(String, Int)]
-allWords2 dict c x y = 
+allWords2 dict c x y = undefined 
 
 -- first get all words with that letter : [String]
-initialWords = [initialWord | initialWord <- allWords1 dict c, length(InitialWord)<=(x+y+1)]
+-- initialWords = [w | w <- allWords1 dict c, (length w <= (x+y+1))]
 
 -- for every element in the list get where the CHAR is at
-elementPositions = map (elemIndices c) initialWords
+-- elementPositions = map (elemIndices c) initialWords
 
 -- zip the resulting lists together:
-wordsWithIntersectionIndices = zip initialWords elementPositions
+-- wordsWithIntersectionIndices = zip initialWords elementPositions
 
+{-
 -- for every pair in the list of the type below:
 -- [ ("tetkaest",[1,5]) , ("test",[1]) ]
 
@@ -134,14 +135,19 @@ else
     if length (fst of above)-1 <=x AND length(snd of above) <=y
     zip [fst (from list)] [ head $ snd (choose from list)] :
     apply same function to rest of list
+-}
 
 -- implementation of the above
-tupConverter :: ([Char], [Int]) -> [([Char], Int)]
-tupConverter ent 
-    | (length $ snd $ ent ) == 1 =
-        splitIntersect = splitAt ((head $ snd $ ent) + 1) (fst $ ent)
-        if (length (fst $ splitIntersect) - 1) <= x &&
-            length (snd splitIntersect) <=y
-        then zip (fst $ ent) [(head $ snd $ ent) + 1]
+tupConverter :: ([Char], [Int]) -> Int -> Int -> [([Char], Int)]
+tupConverter ent x y
+    | (length $ snd $ ent ) == 1 && ((length (fst $ splitIntersect) - 1) <= x) && (length (snd splitIntersect) <=y) = zip [(fst $ ent)] [(head $ snd $ ent)]
+    | otherwise = []
+    where  splitIntersect = splitAt ((head $ snd $ ent) + 1) (fst $ ent)
+
+--        if (length (fst $ splitIntersect) - 1) <= x &&
+--            length (snd splitIntersect) <=y
+--        then zip (fst $ ent) [(head $ snd $ ent) + 1]
+--        else []
+    
 
 
