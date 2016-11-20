@@ -4,6 +4,7 @@ import Data.List
 type Score = Int
 type Board = [[Maybe Char]]
 type Dict = [String]
+type Rack = String
 
 -- Exercise
 boardFromWord:: String -> Board
@@ -204,7 +205,12 @@ tupConverterList' ((t,us) : v) x y
     where splitIntersect = splitAt (head us + 1) t
 -}
 
-
+allWords3 :: Dict -> Rack -> Char -> Int -> Int -> [(String, Int)]
+-- allWords2 with given parametres
+-- go through every word in the list
+-- all letters minus the intersection
+-- check if they are elements of the Rack
+allWords3 dict rack c x y = [(word,pos) | (word,pos) <- allWords2 dict c x y, word\\rack == [] || word\\rack == [c]]
 
 sampleDict :: Dict
 sampleDict = ["abacus", "aardvark", "lion", "mesmerise", "egg", "elsewhere", "somewhere", "tetkaest", "discrepancy"]
