@@ -397,8 +397,38 @@ playMove rack move@(w, ((x, y), orient)) dict b = do
 -- that board, put the move on the board and return the resulting board. You
 -- can assume that the given move is valid on the given board.
 
+writeMoveBram :: Move -> Board -> Board
+writeMoveBram = Bram.writeMove . read . show
+
 writeMove :: Move -> Board -> Board
-writeMove = Bram.writeMove . read . show
+writeMove move b = replaceWith (movePositions move) move b
+  where
+   -- replaceWith (p:ps) move b 
+   --   | (p:ps) == [] = b
+   --   | otherwise = replaceWith ps move (boardMove p b (moveLetter move p))
+  --boardMove (x,y) b c = replaceB x y b c []
+
+replaceWith [] move b = b
+replaceWith (p:ps) move b = replaceWith ps move (boardMove p b (moveLetter move p))
+  where
+    boardMove (x,y) b c = replaceGeneral x y b c []
+
+-- Tries to find the element to be replaced in the whole board
+-- going through all rows on the board
+replaceGeneral :: Int -> Int -> Board -> Maybe Char -> Board -> Board
+replaceGeneral x y [] c allRows = allRows
+replaceGeneral x y (b:bs) c allRows
+  | x==0 = allRows ++ [replaceWithinRow y b c []] ++ bs
+  | otherwise = replaceGeneral (x-1) y bs c (allRows ++ [b])
+
+-- More specific search where we know which row the element is
+-- and simply replace it.
+replaceWithinRow:: Int -> [Maybe Char] -> Maybe Char -> [Maybe Char] -> [Maybe Char]
+replaceWithinRow p [] c r = r
+replaceWithinRow p (b:bs) c r 
+  | p==0 = r ++ [c] ++ bs
+  | otherwise = replaceWithinRow (p-1) bs c (r ++ [b])
+
 
 -- Exercise, medium/hard. We now move to randomly adding letters to the rack.
 --
