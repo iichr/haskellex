@@ -828,7 +828,54 @@ moveScore (Just (w, _)) = wordValue w
 greedyBestMove :: Dict -> Rack -> Board -> FullMove
 -- We use read and show to convert between Bram.FullMove and
 -- Scrabble.FullMove.
-greedyBestMove dict rack b = read (show (Bram.greedyBestMove dict rack b))
+greedyBestMoveBram :: Dict -> Rack -> Board -> FullMove
+greedyBestMoveBram dict rack b = read (show (Bram.greedyBestMove dict rack b))
+
+-- Create a list of tuples for every move with its respective score
+moveWithScore :: [FullMove] -> [(FullMove, Score)]
+moveWithScore xs = [(m,moveScore m) | m <- xs]
+
+-- testing of moveWithScore OK
+-- moveWithScore [Just ("abacus", ((6,5),H) ), Just ("dinosaur", ((1,0),V) ), Nothing]
+
+compareFullMove :: (FullMove, Score) -> (FullMove, Score) -> Ordering
+compareFullMove (fm1, s1) (fm2, s2)
+    | s1 > s2 = GT
+    | s1 < s2 = LT
+    | otherwise = EQ
+
+--greedyBestMove =  undefined
+greedyBestMove dict rack b = fst $ maximumBy compareFullMove makeMoveScoreTuples 
+    where
+        makeMoveScoreTuples = moveWithScore $ (allMoves dict rack b)
+
+-- TESTING
+
+-- using the following:
+{-
+d = autoResize $  boardFromWord "lopat"
+mv = ("translate",((11,7),V))
+d2 = writeMove mv d
+-}
+
+d = autoResize $  boardFromWord "lopat"
+mv = ("thomas",((11,7),V))
+d2 = autoResize $ writeMove mv d
+
+-- greedyBestMove (reverse sowpods) "dice" d2
+-- outputs: ("cited",((9,14),H))
+
+-- greedyBestMove sowpods "dice" d2
+-- outputs: ("ticed",((11,14),H))
+
+--c.p with
+
+-- greedyBestMoveBram (reverse sowpods) "dice" d2
+-- ("cited",((9,14),H))
+
+-- non reverse
+-- ("ticed",((11,14),H))
+
 
 -- The main advanced exercise is about making an AI play against itself.
 --
